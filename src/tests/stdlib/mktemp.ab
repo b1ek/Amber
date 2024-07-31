@@ -1,0 +1,8 @@
+import { mktemp, dir_exist } from "std/fs";
+
+main(args) {
+    let dir = unsafe mktemp(true)
+    if dir_exist(dir) {
+        echo "Succeded"
+    }
+}
