@@ -1,0 +1,8 @@
+import { run_in_tmp } from "std/fs";
+
+main(args) {
+    let old = unsafe run_in_tmp()
+    if old != unsafe $pwd$ {
+        echo "Succeded"
+    }
+}
