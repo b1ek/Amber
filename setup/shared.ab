@@ -1,5 +1,7 @@
 import { has_failed, exit } from "std/env"
 import { includes } from "std/array"
+import { file_exist } from "std/fs"
+import { contains } from "std/text"
 
 pub fun get_os(): Text {
     // Determine OS type
@@ -36,6 +38,39 @@ pub fun get_arch(): Text {
         else "x86_64"
 
     return arch
+}
+
+/// Get the installed distro name
+/// 
+/// @returns {Text} Will be one of: `""`, `"arch"`, `"snap"`, `"nix"`
+pub fun get_distro(): Text {
+    if contains(get_os(), "linux") == false {
+        return ""
+    }
+
+    if file_exist("/etc/arch-release") {
+        let ok = true
+        silent $pacman --version$ failed {
+            ok = false
+        }
+        if ok {
+            return "arch"
+        }
+    }
+
+    if file_exist("/etc/NIXOS") {
+        return "nix"
+    }
+
+    let snap = true
+    silent $snap$ failed {
+        snap = false
+    }
+    if snap {
+        return "snap"
+    }
+
+    return ""
 }
 
 fun get_home(): Text {

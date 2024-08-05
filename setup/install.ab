@@ -1,8 +1,8 @@
 import { has_failed, exit, input } from "std/env"
 import { chars } from "std/text"
 import { includes } from "std/array"
-import { file_exist } from "std/fs"
-import { get_os, get_arch, get_place, get_bins_folder } from "./shared.ab"
+import { file_exist, mktemp } from "std/fs"
+import { get_os, get_arch, get_distro, get_place, get_bins_folder } from "./shared.ab"
 
 let name = "AmberNative"
 let target = "amber"
@@ -24,9 +24,58 @@ fun get_latest_release_tag() {
     return tag
 }
 
+fun install_via_pkg(args: [Text], distro: Text): Null {
+    if includes(args, "--no-distro-install") {
+        return null
+    }
+    if includes(args, "--user") {
+        return null
+    }
+
+    if distro == "nix" {
+        echo "Refusing to install on nix"
+        echo ""
+        echo "It seems that you are using nix and would probably like to do it the weird nix way."
+        echo "Please see https://github.com/amber-lang/amber/blob/master/NIX.md for reference"
+        echo "or pass --no-distro-install arg if you want the script to try to install it anyway"
+        exit(1)
+    }
+
+    if distro == "arch" {
+        echo "Arch detected, installing via AUR..."
+        echo "Pass --no-distro-install to install without a package manager"
+        if has_failed("git --version") {
+            echo "To install on arch, git executable is required to be installed"
+            exit(1)
+        }
+        let clone = mktemp(true)?
+        $git clone https://aur.archlinux.org/amber-bash-bin.git {clone} -b master$?
+        $cd {clone}$?
+        unsafe $makepkg -si --noconfirm$
+        exit(status)
+    }
+
+    if distro == "snap" {
+        echo "Snap detected, installing from https://snapcraft.io/amber-bash ..."
+        echo "Pass --no-distro-install to install without a package manager"
+        unsafe $sudo snap install amber-bash$
+        exit(status)
+    }
+}
+
 main(args) {
     let os = get_os()
     let arch = get_arch()
+    let distro = get_distro()
+
+    if distro != "" {
+        install_via_pkg(args, distro) failed {
+            echo "Installation failed"
+            exit(1)
+        }
+    }
+    echo "Distro is {distro}"
+    exit(0)
 
     let user_only_install = includes(args, "--user")
     let place = get_place(user_only_install)
