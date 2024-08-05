@@ -1,7 +1,8 @@
-import { exit, includes } from "std"
-import { get_arch, get_place, get_bins_folder } from "./shared.ab"
+import { exit } from "std/env"
+import { includes } from "std/array"
+import { get_arch, get_place, get_distro, get_bins_folder } from "./shared.ab"
 
-fun install_via_pkg(args: [Text], distro: Text) {
+fun install_via_pkg(args: [Text], distro: Text): Null {
     if includes(args, "--no-distro-install") {
         return null
     }
