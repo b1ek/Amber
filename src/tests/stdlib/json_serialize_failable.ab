@@ -1,0 +1,16 @@
+// Output
+// "brave is true and the home is free"
+// ""
+
+import { serialize } from "std/json";
+
+fun failable(brave: Bool): Text? {
+    // you want to live free in the home of the brave
+    if brave != true { // but the home isnt free if the brave arent true
+        fail
+    }
+    return "brave is true and the home is free"
+}
+
+echo serialize(trust failable(true))
+echo serialize(trust failable(false))

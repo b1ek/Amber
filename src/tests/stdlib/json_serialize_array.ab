@@ -1,0 +1,14 @@
+// Output
+// []
+// [1,2,3]
+// [true,false,true]
+// [null,null,null]
+// ["1","true","null","\"","\\"]
+
+import { serialize } from "std/json";
+
+echo serialize([Null])
+echo serialize([1, 2, 3])
+echo serialize([true, false, true])
+echo serialize([null, null, null])
+echo serialize(["1", "true", "null", "\"", "\\"])

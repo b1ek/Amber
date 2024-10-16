@@ -1,0 +1,12 @@
+// Output
+// 1
+// true
+// null
+// " \" \\ "
+
+import { serialize } from "std/json";
+
+echo serialize(1)
+echo serialize(true)
+echo serialize(null)
+echo serialize(" \" \\ ")
