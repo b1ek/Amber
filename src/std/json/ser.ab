@@ -1,0 +1,46 @@
+import * from "std/text";
+
+fun seriailze_text(obj: Text): Text {
+    return "\"" + replace_regex(replace_regex(obj, "\\\\", "\\\\\\\\"), "\"", "\\\\\"") + "\"";
+}
+
+fun serialize_num(obj: Num): Text {
+    return obj as Text
+}
+
+fun serialize_null(obj: Null): Text {
+    return "null"
+}
+
+fun serialize_bool(obj: Bool): Text {
+    if obj {
+        return "true"
+    }
+    return "false"
+}
+
+#[allow_absurd_cast]
+pub fun inner_serialize(obj): Text {
+    if obj is Num {
+        return serialize_num(obj as Num);
+    }
+    if obj is Null {
+        return serialize_null(obj as Null)
+    }
+    if obj is Bool {
+        return serialize_bool(obj as Bool)
+    }
+    if obj is Text {
+        return seriailze_text(obj as Text)
+    }
+    return ""
+}
+
+pub fun inner_seriailze_arr(arr: []): Text {
+    if len(arr) == 0 { return "[]" }
+    let out = "[";
+    loop obj in arr {
+        out += inner_serialize(obj) + ","
+    }
+    return slice(out, 0, len(out) - 1) + "]";
+}

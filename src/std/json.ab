@@ -1,0 +1,18 @@
+import { inner_serialize, inner_seriailze_arr } from "std/json/ser"
+
+#[allow_absurd_cast]
+pub fun serialize(obj): Text {
+    if obj is [Num] {
+        return inner_seriailze_arr(obj as [Num])
+    }
+    if obj is [Null] {
+        return inner_seriailze_arr(obj as [Null])
+    }
+    if obj is [Bool] {
+        return inner_seriailze_arr(obj as [Bool])
+    }
+    if obj is [Text] {
+        return inner_seriailze_arr(obj as [Text])
+    }
+    return inner_serialize(obj)
+}
