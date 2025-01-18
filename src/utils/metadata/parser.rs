@@ -30,6 +30,8 @@ pub struct ParserMetadata {
     pub messages: Vec<Message>,
     /// Show standard library usage in documentation
     pub doc_usage: bool,
+    /// If debug messages should be emitted
+    pub is_debug: bool
 }
 
 impl ParserMetadata {
@@ -185,6 +187,7 @@ impl Metadata for ParserMetadata {
             context: Context::new(path, tokens),
             messages: Vec::new(),
             doc_usage: false,
+            is_debug: false
         }
     }
 

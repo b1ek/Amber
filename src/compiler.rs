@@ -21,7 +21,8 @@ use std::time::Instant;
 pub mod postprocessor;
 
 const NO_CODE_PROVIDED: &str = "No code has been provided to the compiler";
-const AMBER_DEBUG_PARSER: &str = "AMBER_DEBUG_PARSER";
+
+const AMBER_DEBUG: &str = "AMBER_DEBUG";
 const AMBER_DEBUG_TIME: &str = "AMBER_DEBUG_TIME";
 
 pub struct CompilerOptions {
@@ -110,13 +111,15 @@ impl AmberCompiler {
     pub fn parse(&self, tokens: Vec<Token>) -> Result<(Block, ParserMetadata), Message> {
         let code = self.cc.code.as_ref().expect(NO_CODE_PROVIDED).clone();
         let mut meta = ParserMetadata::new(tokens, self.path.clone(), Some(code));
+        meta.is_debug = Self::env_flag_set(AMBER_DEBUG);
+        
         if let Err(Failure::Loud(err)) = check_all_blocks(&meta) {
             return Err(err);
         }
         let mut block = Block::new();
         let time = Instant::now();
         // Parse with debug or not
-        let result = if Self::env_flag_set(AMBER_DEBUG_PARSER) {
+        let result = if meta.is_debug {
             block.parse_debug(&mut meta)
         } else {
             block.parse(&mut meta)
