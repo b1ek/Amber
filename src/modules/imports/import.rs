@@ -9,6 +9,7 @@ use crate::utils::context::{Context, FunctionDecl};
 use crate::utils::{ParserMetadata, TranslateMetadata};
 use crate::translate::module::TranslateModule;
 use super::import_string::ImportString;
+use super::package::PackageResolver;
 
 #[derive(Debug, Clone)]
 pub struct Import {
@@ -17,7 +18,8 @@ pub struct Import {
     token_path: Option<Token>,
     is_all: bool,
     is_pub: bool,
-    export_defs: Vec<(String, Option<String>, Option<Token>)>
+    export_defs: Vec<(String, Option<String>, Option<Token>)>,
+    resolve: PackageResolver
 }
 
 impl Import {
@@ -77,12 +79,18 @@ impl Import {
                     format!("Standard library module '{}' does not exist", self.path.value))
             }
         } else {
-            match fs::read_to_string(self.path.value.clone()) {
-                Ok(content) => Ok(content),
-                Err(err) => error!(meta, self.token_path.clone() => {
-                    message: format!("Could not read file '{}'", self.path.value),
-                    comment: err.to_string()
-                })
+            if let Some(resolved) = self.resolve.resolve(&self.path.value) {
+                match fs::read_to_string(&resolved) {
+                    Ok(content) => Ok(content),
+                    Err(err) => error!(meta, self.token_path.clone() => {
+                        message: format!("Could not read file '{}' (resolved to '{}')", self.path.value, resolved.display()),
+                        comment: err.to_string()
+                    })
+                }
+            } else {
+                return error!(meta, self.token_path.clone() => {
+                    message: format!("Could not resolve {}", self.path.value)
+                });
             }
         }
     }
@@ -130,7 +138,8 @@ impl SyntaxModule<ParserMetadata> for Import {
             token_path: None,
             is_all: false,
             is_pub: false,
-            export_defs: vec![]
+            export_defs: vec![],
+            resolve: PackageResolver::new()
         }
     }
 

@@ -1,0 +1,5 @@
+// Output
+// test file was imported successfully
+
+import { check } from "./src/tests/validity/package_test_file_to_be_imported.ab";
+echo check();

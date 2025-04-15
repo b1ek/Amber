@@ -1,0 +1,5 @@
+// No output
+
+pub fun check() {
+    return "test file was imported successfully"
+}

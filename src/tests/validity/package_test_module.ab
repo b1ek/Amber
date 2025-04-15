@@ -1,0 +1,5 @@
+// Output
+// test module was loaded successfully
+
+import * from "test_module";
+echo check();
